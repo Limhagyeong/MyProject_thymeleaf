@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://unpkg.com/vue@3"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript">
+let i=0
+$(function(){
+	$('.updates').click(function(){
+		$('.ups').hide()
+		$('.updates').val('수정')
+		let no=$(this).attr("alt")
+		if(i==0)
+		{
+			$(this).val("취소")
+			$('#u'+no).show()
+			i=1
+		}
+		else
+		{
+			$(this).val("수정")
+			$('#u'+no).hide()
+			i=0
+		}
+	})
+})
+</script>
+</head>
+<body>
+ <div class="bg-light py-3" id="detail">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 mb-0"><a href="/goods/main">상품목록 돌아가기</a>
+        </div>
+      </div>
+    </div>  
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row" >
+          <div class="col-md-6">
+            <img th:src="${gs.g_img}" alt="Image" class="img-fluid">
+          </div>
+          <div class="col-md-6">
+            <h2 class="text-black" th:text="${gs.g_name}"></h2>
+            <p><strong class="text-primary h4" th:text="${gs.g_price}"></strong></p>
+            <div class="mb-5">
+              <div class="input-group mb-3" style="max-width: 120px;">
+              <div class="input-group-prepend">
+                <button class="btn btn-outline-primary js-btn-minus" type="button">&minus;</button>
+              </div>
+              <input type="text" class="form-control text-center" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+              <div class="input-group-append">
+                <button class="btn btn-outline-primary js-btn-plus" type="button">&plus;</button>
+              </div>
+            </div>
+
+            </div>
+             <span style="border-bottom: 1px solid grey">상품 판매금액의 1%는 취약계층아동에게 기부됩니다</span>
+              <div style="margin-top: 20px;">
+                 <span><i class="fa-solid fa-check"></i>&nbsp;배송비 3000원 (27,900원 이상 구매시 무료배송)</span>
+            </div>
+            <div class="gButton" style="display: flex; margin-top: 50px;">
+            <input type="button" class="buy-now btn btn-sm btn-primary" style="width: 150px;" value="Add To Cart">
+            <input type="button" class="buy-now btn btn-sm btn-primary" style="width: 150px; margin-left: 10px;" value="Go WishList">
+            </div>
+          </div>
+          <div class="row" style="border-top: 1px solid grey; margin: 20px auto;">
+				<div style="margin-top: 15px;">
+					<span><a href="#">Details | </a></sapn> 
+					<span><a href="#">Review | </a></sapn> 
+					<span><a href="#">Q&A | </a></sapn>
+					<span><a href="#">Order info</a></sapn>
+				</div>
+			</div>
+			<div class="subImgShow" id="image-container" style="height: 500px; overflow: hidden;">
+				<div class="row" th:each="vo:${gsList}" ref="subImg" style="margin: 20px 0 0 50px; width: 100%; height: auto">
+					<img th:src="${vo.g_subimg}">
+				</div>
+				</div>
+				<input type="button" class="form-control" ref="subImg" value="상품상세보기" @click="subImgShow()">
+			</div>
+			</div>
+      </div>
+    </div>
+     <div class="site-section block-3 site-blocks-2 bg-light">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-7 site-section-heading text-center pt-4">
+            <h2>Review</h2>
+          </div>
+        </div>
+        <div>
+        
+        </div>
+        <div class="row" data-aos="fade-up">
+        
+              <div class="col-md-6" th:each="rvo:${rList}" style="margin: 20px 0 20px 0;">
+              <div class="p-2 p-lg-5 border" style="height: 400px" >
+                 <div class="form-group row">
+                  <div class="col-md-12">
+                    <label class="text-black" th:text="'작성자 : '+${rvo.name}+' ('+${rvo.id}+')'"></label>
+                  </div>
+         			</div>
+                  <div class="form-group row">
+                  <div class="col-md-12">
+                    <label class="text-black" th:text="'제목 : '+${rvo.subject}"></label>
+                  </div>
+                  </div>
+                  <div class="form-group row">
+                  <div class="col-md-12">
+                    <textarea cols="20" rows="4" class="form-control" readonly style="resize: none" th:text="${rvo.msg}"></textarea>
+                  	<div class="col-md-6" style="margin-top: 50px;" th:if="${session.id==rvo.id}">
+        						<input type="button" value="수정" class="updates" th:alt="${rvo.no}">
+        						<a th:href="@{/reply/delete(gno=${rvo.gno},no=${rvo.no})}" class="btn"><input type="button" value="삭제"></a>
+                  </div>
+                  </div>
+                  </div>
+               
+                </div>
+              <div th:id="|u${rvo.no}|" class="ups" style="display: none">
+              <form method="post" action="/reply/insert">
+              <div class="form-group row">
+                  <div class="col-md-12">
+                    <input type="hidden" name="no" th:value="${rvo.no}">
+				    <input type="hidden" name="gno" th:value="${gs.gno}">
+                    <label for="c_message" class="text-black"> </label>
+                    <textarea id="msg" name="msg" cols="30" rows="6" class="form-control" required style="resize: none" th:text="${rvo.msg}"></textarea>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-lg-12">
+                    <input type="submit" class="btn btn-primary btn-lg btn-block" value="Edit Review">
+                  </div>
+                </div>
+                </form>				
+              </div>
+              </div>
+                </div>
+              <div class="col-md-12">
+              <div class="site-block-27 text-center" th:if="${size!=0}">
+                  <ul>
+                    <li th:if="${startpage>1}"><a th:href="@{/goods/detail(page=${startpage-1},gno=${gs.gno})}">&lt;</a></li>
+          <li th:class="${curpage==i?'active':''}" th:each="i:${#numbers.sequence(startpage,endpage)}">
+          <a th:href="@{/goods/detail(page=${i},gno=${gs.gno})}" th:text="${i}"></a></li>
+          <li th:if="${endpage<totalpage}"><a th:href="@{/goods/detail(page=${endpage+1},gno=${gs.gno})}">&gt;</a></li>
+                  </ul>
+                </div>
+                <div class="site-block-27 text-center" th:unless="${size!=0}" style="margin-top: 50px;">
+                  <span >등록된 리뷰가 없습니다</span>
+                </div>
+              </div>
+              </div>
+        </div>
+        </div>
+        
+            <div class="site-section" th:if=${session.id!=null}>
+      <div class="container" >
+        <div class="row">
+          <div class="col-md-12">
+            <h2 class="h3 mb-3 text-black">Write Review</h2>
+          </div>
+          <div class="col-md-12">
+
+            <form action="/reply/insert" method="post">
+              
+              <div class="p-3 p-lg-5 border">
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <label for="c_subject" class="text-black">Subject </label>
+                    <input type="text" class="form-control" id="subject" name="subject" required>
+                    <input type="hidden" name="gno" th:value="${gs.gno}">
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-md-12">
+                    <label for="c_message" class="text-black">Message </label>
+                    <textarea id="msg" name="msg" cols="30" rows="6" class="form-control" required style="resize: none"></textarea>
+                  </div>
+                </div>
+                <div class="form-group row">
+                  <div class="col-lg-12">
+                    <input type="submit" class="btn btn-primary btn-lg btn-block" value="Send Message">
+                  </div>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="../js/detailshow.js"/>
+</body>
+</html>

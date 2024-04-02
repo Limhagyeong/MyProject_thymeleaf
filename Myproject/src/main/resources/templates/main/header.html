@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+ <div class="site-wrap">
+    <header class="site-navbar" role="banner">
+      <div class="site-navbar-top">
+        <div class="container">
+          <div class="row align-items-center" id="login">
+
+            <div class="col-6 col-md-4 order-2 order-md-1 site-search-icon text-left">
+              <form action="" class="site-block-top-search">
+                <span class="icon icon-search2"></span>
+                <input type="text" class="form-control border-0" placeholder="Search">
+              </form>
+            </div>
+
+            <div class="col-12 mb-3 mb-md-0 col-md-4 order-1 order-md-2 text-center">
+              <div class="site-logo">
+                <a href="/" class="js-logo-clone">Good Shopper</a>
+              </div>
+            </div>
+
+            <div class="col-6 col-md-4 order-3 order-md-3 text-right">
+             <div class="site-top-icons" th:if="${session.id==null}">
+             <div class="login" style="display: flex">
+             <input type="text" size="10" ref="id" v-model="id" placeholder="ID">
+             <input type="password" size="10" ref="pwd" v-model="pwd" placeholder="PWD">
+             <button @click="login()">로그인</button>
+             </div>
+             </div>
+            
+              <div class="site-top-icons" th:unless="${session.id==null}">
+                <ul>
+                  <li><a href="#"><span class="icon icon-person"></span></a></li>
+                  <li><a href="#"><span class="icon icon-heart-o"></span></a></li>
+                  <li>
+                    <a href="cart.html" class="site-cart">
+                      <span class="icon icon-shopping_cart"></span>
+                      <span class="count">2</span>
+                    </a>
+                  </li> 
+                  <li class="d-inline-block d-md-none ml-md-0"><a href="#" class="site-menu-toggle js-menu-toggle"><span class="icon-menu"></span></a></li>
+                </ul>
+                <span th:text="${session.name}+'님 환영합니다'"></span>
+                 <button @click="logout()">로그아웃</button>
+              </div> 
+            </div>
+
+          </div>
+          
+        </div>
+      </div> 
+      
+      <nav class="site-navigation text-right text-md-center" role="navigation">
+        <div class="container">
+          <ul class="site-menu js-clone-nav d-none d-md-block">
+            <li class="has-children active">
+              <a href="/">Home</a>
+            </li>
+            <li><a href="shop.html">물품기부</a></li>
+            <li><a href="/goods/main">상품</a></li>
+            <li class="has-children">
+              <a href="about.html">커뮤니티</a>
+              <ul class="dropdown">
+              	<li><a href="#">공지사항</a></li>
+                <li><a href="#">자주 묻는 질문</a></li>
+                <li><a href="#">문의하기</a></li>
+              </ul>
+            </li>
+             <li><a href="shop.html">오늘의 뉴스</a></li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+    </div>
+	<script> 
+	let login=Vue.createApp({
+		data(){
+			  return{
+				  id:'',
+			  	  pwd:''
+			  }
+		  },
+		  methods:{
+			  login(){
+				  if(this.id==='')
+					{
+					  this.$refs.id.focus()
+					  return
+					}
+				  if(this.pwd==='')
+					{
+					  this.$refs.pwd.focus()
+					  return
+					}
+				  axios.post("/member/login",null,{
+					  params:{
+						  id:this.id,
+						  pwd:this.pwd
+					  }
+				  }).then(res=>{
+					  console.log(res.data)
+					  if(res.data=="NOID")
+						 {
+						  
+						  	alert("존재하지 않는 아이디 입니다")
+						  	this.id=''
+						  	this.pwd=''
+						  	this.$refs.id.focus()
+						 }
+					  else if(res.data=="NOPWD")
+						  {
+						  alert("틀린 비밀번호 입니다")
+						  	this.pwd=''
+						  	this.$refs.pwd.focus()
+						  }
+					  else
+						  {
+						  	location.href="/"
+						  }
+				  })
+			  },
+			  logout(){
+				  axios.get("/member/logout").then(res=>{
+					  if(res.data=="yes")
+						 {
+						  	location.href="/"
+						 }
+					  else
+						  {
+						  	alert("로그아웃 실패")
+						  }
+				  })
+			  }
+		  }
+	}).mount('#login')
+	 </script>
+</body>
+</html>
